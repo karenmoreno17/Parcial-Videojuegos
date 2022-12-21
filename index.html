@@ -82,12 +82,7 @@
       santa.setCollideWorldBounds(true);
       emitter.startFollow(santa, -10, 40, false);
 
-      if (!fin) {
-        this.time.delayedCall(0, nuevaColumna, [], this);
-      }
-      else {
-        console.log(fin);
-      }
+      this.time.delayedCall(0, nuevaColumna, [], this);
 
     }
 
@@ -117,20 +112,23 @@
       const columna = this.physics.add.group();
       const hueco = Math.floor(Math.random() * 5) + 1;
       const aleatorio = Math.floor(Math.random() * 2)
-      for (let i = 0; i < 8; i++) {
-        if (i !== hueco && i !== hueco + 1 && i !== hueco - 1) {
-          let cubo;
-          if (i == hueco - 2) {
-            cubo = columna.create(960, i * 100, 'pipeEntrada' + aleatorio);
-          }
-          else if (i == hueco + 2) {
-            cubo = columna.create(960, i * 100, 'pipeEntrada' + aleatorio);
-          }
-          else {
-            cubo = columna.create(960, i * 100, 'pipe' + aleatorio);
-          }
 
-          cubo.body.allowGravity = false;
+      if (fin === false) {
+        for (let i = 0; i < 8; i++) {
+          if (i !== hueco && i !== hueco + 1 && i !== hueco - 1) {
+            let cubo;
+            if (i == hueco - 2) {
+              cubo = columna.create(960, i * 100, 'pipeEntrada' + aleatorio);
+            }
+            else if (i == hueco + 2) {
+              cubo = columna.create(960, i * 100, 'pipeEntrada' + aleatorio);
+            }
+            else {
+              cubo = columna.create(960, i * 100, 'pipe' + aleatorio);
+            }
+
+            cubo.body.allowGravity = false;
+          }
         }
       }
       columna.setVelocityX(-200);
