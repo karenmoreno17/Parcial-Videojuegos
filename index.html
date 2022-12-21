@@ -2,14 +2,142 @@
 <html>
 
 <head>
-  <script src="//cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
 </head>
 
 <body>
 
-  <script src="/src/escenaJuego.js"></script>
-  <script src="/src/escenaFin.js"></script>
-  <script src="/src/index.js"></script>
+  <script>
+    var config = {
+      type: Phaser.AUTO,
+      width: 960,
+      height: 640,
+      physics: {
+        default: 'arcade',
+        arcade: {
+          gravity: { y: 500 }
+        }
+      },
+      scene: {
+        preload: preload,
+        create: create,
+        update: updateScene,
+      }
+    };
+
+    var game = new Phaser.Game(config);
+
+    //Variables
+    var santa;
+
+    function preload() {
+      this.load.setBaseURL('http://localhost:3000');
+      this.load.image('fondo', './assets/img/city.jpg');
+      this.load.image('regalo', 'assets/img/regalo.png');
+      this.load.spritesheet('santa', 'assets/img/spriteSanta.png', { frameWidth: 45.5, frameHeight: 77 });
+      this.load.image('pipe0', 'assets/img/chimeneaCu.png');
+      this.load.image('pipeEntrada0', 'assets/img/entradaChime.png');
+      this.load.image('pipe1', 'assets/img/columnaCu.png');
+      this.load.image('pipeEntrada1', 'assets/img/columnaTope.png');
+      this.load.image('pantallaOver', 'assets/img/pantallaFinal.png');
+    }
+
+    function create() {
+
+      this.input.on('pointerdown', () => saltar());
+
+      this.add.image(480, 320, 'fondo');
+
+      santa = this.player = this.physics.add.sprite(50, 100, 'santa');
+      this.anims.create({
+        key: 'volar',
+        frames: this.anims.generateFrameNumbers('santa', { frames: [3, 4] }),
+        frameRate: 6,
+        repeat: -1,
+      });
+      santa.play('volar');
+
+      this.anims.create({
+        key: 'saltar',
+        frames: this.anims.generateFrameNumbers('santa', { frames: [5, 6, 7, 8, 9, 10, 9] }),
+        frameRate: 7,
+        repeat: 0,
+      });
+
+      santa.on('animationcomplete', animationComplete, this)
+
+      /*
+      var particles = this.add.particles('regalo');
+      var emitter = particles.createEmitter({
+        speed: 5,
+        scale: { start: 0.05, end: 0.05 }
+      });
+      */
+
+      santa.setCollideWorldBounds(true);
+      //emitter.startFollow(santa, 0, 50, false);
+
+
+      this.time.delayedCall(0, nuevaColumna, [], this);
+
+    }
+
+    function updateScene() {
+      this.input.keyboard.on('keydown', (event) => {
+        if (event.keyCode == 32) {
+          saltar();
+        }
+      });
+    }
+
+    function saltar() {
+      santa.setVelocityY(-200);
+      santa.play('saltar');
+    }
+
+    function animationComplete(animation, frame, sprite) {
+      if (animation.key === 'saltar') {
+        santa.play('volar');
+      }
+    }
+
+    function nuevaColumna() {
+      const columna = this.physics.add.group();
+      const hueco = Math.floor(Math.random() * 5) + 1;
+      const aleatorio = Math.floor(Math.random() * 2)
+      for (let i = 0; i < 8; i++) {
+        if (i !== hueco && i !== hueco + 1 && i !== hueco - 1) {
+          let cubo;
+          if (i == hueco - 2) {
+            cubo = columna.create(960, i * 100, 'pipeEntrada' + aleatorio);
+          }
+          else if (i == hueco + 2) {
+            cubo = columna.create(960, i * 100, 'pipeEntrada' + aleatorio);
+          }
+          else {
+            cubo = columna.create(960, i * 100, 'pipe' + aleatorio);
+          }
+
+          cubo.body.allowGravity = false;
+        }
+      }
+
+      console.log(columna);
+      columna.setVelocityX(-200);
+      columna.checkWorlBounds = true;
+      columna.outOfBoundsKill = true;
+
+      this.physics.add.overlap(santa, columna, hitColumna, null, this);
+      this.time.delayedCall(1250, nuevaColumna, [], this);
+
+    }
+
+    function hitColumna() {
+      this.add.image(480, 320, 'pantallaOver');
+    }
+
+
+  </script>
 
 </body>
 
