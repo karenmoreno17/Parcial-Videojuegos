@@ -66,16 +66,19 @@
 
       santa.on('animationcomplete', animationComplete, this)
 
-      /*
+
       var particles = this.add.particles('regalo');
       var emitter = particles.createEmitter({
-        speed: 5,
-        scale: { start: 0.05, end: 0.05 }
+        speed: -10,
+        scale: { start: 0.07, end: 0.05 },
+        moveTo: true,
+        moveToX: -1,
+        moveToY: 380,
       });
-      */
+
 
       santa.setCollideWorldBounds(true);
-      //emitter.startFollow(santa, 0, 50, false);
+      emitter.startFollow(santa, -10, 40, false);
 
 
       this.time.delayedCall(0, nuevaColumna, [], this);
